@@ -23,7 +23,7 @@
 
         <div class="field password current required">
             <label class="label" for="current-password">
-                <span><?php echo $this->__('Password'); ?></span>
+                <strong><?php echo $this->__('Password'); ?></strong>
             </label>
             <div class="control">
                 <input type="password" class="input-text required-entry" name="password" id="password" autocomplete="off"/>
@@ -32,13 +32,13 @@
 
         <div class="field reason required">
             <label class="label" for="reason">
-                <span><?php echo $this->__('Reason'); ?></span>
+                <strong><?php echo $this->__('Reason'); ?></strong>
             </label>
             <div class="control">
-                <textarea class="textarea input-text required-entry" name="reason" id="reason" autocomplete="off"></textarea>
+                <textarea style="float: none" class="textarea input-text required-entry" name="reason" id="reason" autocomplete="off"></textarea>
             </div>
             <div class="comment">
-                <?php echo $this->helper->getDeleteReason(); ?>
+                <p><?php echo $this->helper->getDeleteReason(); ?></p>
             </div>
         </div>
 

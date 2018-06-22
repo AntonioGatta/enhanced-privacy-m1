@@ -31,6 +31,8 @@ class Flurrybox_EnhancedPrivacy_AccountController extends Mage_Core_Controller_F
             return;
         }
 
+        $this->_title(null, true);
+        $this->_title($this->__('Privacy Settings'), true);
         $this->loadLayout();
         $this->renderLayout();
     }
@@ -51,9 +53,9 @@ class Flurrybox_EnhancedPrivacy_AccountController extends Mage_Core_Controller_F
             $export = Mage::getModel('flurrybox_enhancedprivacy/export');
             $export->export();
 
-            $this->getSession()->addSuccess("Data exported successfully.");
+            $this->getSession()->addSuccess($this->__('Data exported successfully.'));
         } catch (Exception $exception) {
-            $this->getSession()->addException($exception,'Something went wrong, please try again later!');
+            $this->getSession()->addException($exception, $this->__('Something went wrong, please try again later!'));
             Mage::logException($exception);
         }
 
@@ -71,7 +73,8 @@ class Flurrybox_EnhancedPrivacy_AccountController extends Mage_Core_Controller_F
             $this->_redirect('customer/account/login');
             return;
         }
-
+        $this->_title(null, true);
+        $this->_title($this->__('Delete Account'), true);
         $this->loadLayout();
         $this->renderLayout();
     }
@@ -158,9 +161,9 @@ class Flurrybox_EnhancedPrivacy_AccountController extends Mage_Core_Controller_F
             $cleanupItem = Mage::getModel('flurrybox_enhancedprivacy/cleanup')
                 ->load($customer->getId(),'customer_id');
             $cleanupItem->delete();
-            $this->getSession()->addSuccess("Account deletion has been canceled.");
+            $this->getSession()->addSuccess($this->__('Account deletion has been canceled.'));
         } catch(Exception $exception) {
-            $this->getSession()->addException($exception,'Something went wrong, please try again later!');
+            $this->getSession()->addException($exception, $this->__('Something went wrong, please try again later!'));
             Mage::logException($exception);
         }
 

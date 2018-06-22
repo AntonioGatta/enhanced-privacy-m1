@@ -38,27 +38,30 @@ class Flurrybox_EnhancedPrivacy_Model_Privacy_Export_CustomerQuote extends
     {
         $storeIds = Mage::app()->getWebsite($this->getWebsiteId())->getStoreIds();
 
-        $quote = Mage::getModel('sales/quote')
-            ->setSharedStoreIds($storeIds)
-            ->loadByCustomer($customer);
-
-        if ($quote) {
-            $quoteCollection = $quote->getItemsCollection(false);
-        } else {
-            $quoteCollection = new Varien_Data_Collection();
-        }
-
-        $quoteCollection->addFieldToFilter('parent_item_id', array('null' => true));
+        $quotes = Mage::getModel('sales/quote')->getCollection()
+            ->addFieldToFilter('customer_id', $customer->getId())
+            ->addFieldToFilter('store_id', ['in' => $storeIds])
+        ;
 
         $data[] = ['PRODUCT NAME', 'SKU', 'QUANTITY', 'PRICE'];
 
-        foreach ($quoteCollection as $item) {
-            $data[] = [
-                $item->getName(),
-                $item->getSku(),
-                $item->getQty(),
-                $item->getPrice()
-            ];
+        foreach ($quotes as $quote) {
+            if ($quote) {
+                $quoteCollection = $quote->getItemsCollection(false);
+            } else {
+                $quoteCollection = new Varien_Data_Collection();
+            }
+
+            $quoteCollection->addFieldToFilter('parent_item_id', array('null' => true));
+
+            foreach ($quoteCollection as $item) {
+                $data[] = [
+                    $item->getName(),
+                    $item->getSku(),
+                    $item->getQty(),
+                    $item->getPrice()
+                ];
+            }
         }
 
         return $data;

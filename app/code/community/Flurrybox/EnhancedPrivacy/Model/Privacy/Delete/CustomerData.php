@@ -68,7 +68,7 @@ class Flurrybox_EnhancedPrivacy_Model_Privacy_Delete_CustomerData extends
      */
     protected function getAnonymousEmail($customerId)
     {
-        return uniqid($customerId) . '@' . Data::ANONYMOUS_STR . '.com';
+        return uniqid($customerId, true) . '@' . Data::ANONYMOUS_STR . '.com';
     }
 
 }

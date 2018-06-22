@@ -59,12 +59,14 @@
                         </information_page>
                         <general_information translate="label">
                             <label>Brief Information</label>
-                            <frontend_type>text</frontend_type>
+                            <frontend_type>textarea</frontend_type>
                             <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment>Brief information about your private policy. This text will be displayed in the settings of the user account.</comment>
+                            <comment>Brief information about your private policy. This text will be displayed in the
+                                settings of the user account.
+                            </comment>
                             <depends>
                                 <general_enable>1</general_enable>
                             </depends>

@@ -44,11 +44,13 @@ class Flurrybox_EnhancedPrivacy_Model_Export
 
         $path = $this->helper->getZipPath();
 
-        if (!is_dir($path)){
-            mkdir($path);
+        if (!is_dir($path)) {
+            if (!mkdir($path) && !is_dir($path)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $path));
+            }
         }
 
-        $zipFileName = 'customer_data_'.$date.'.zip';
+        $zipFileName = 'customer_data_' . $date . '.zip';
         $files = [];
 
         foreach ($this->mapProcessors($this->getProcessors()) as $name => $processor) {
@@ -56,8 +58,8 @@ class Flurrybox_EnhancedPrivacy_Model_Export
                 continue;
             }
 
-            $fileName = $name .'_'. $date .'.csv';
-            $this->createCsv($fileName,$processor->export($customer));
+            $fileName = $name . '_' . $date . '.csv';
+            $this->createCsv($fileName, $processor->export($customer));
 
             $files[] = $fileName;
         }
@@ -76,7 +78,7 @@ class Flurrybox_EnhancedPrivacy_Model_Export
      */
     protected function createCsv($fileName, $data)
     {
-        $handle = fopen($this->helper->getZipPath().$fileName, 'w+');
+        $handle = fopen($this->helper->getZipPath() . $fileName, 'w+');
 
         foreach ($data as $line) {
             fputcsv($handle, $line);
@@ -92,7 +94,7 @@ class Flurrybox_EnhancedPrivacy_Model_Export
      */
     protected function prepareDownload($zipFileName)
     {
-        if (file_exists($this->helper->getZipPath().$zipFileName)) {
+        if (file_exists($this->helper->getZipPath() . $zipFileName)) {
             header('Content-type: application/zip');
             header('Content-Disposition: attachment; filename="' . $zipFileName . '"');
             readfile($this->helper->getZipPath() . $zipFileName);
@@ -109,20 +111,24 @@ class Flurrybox_EnhancedPrivacy_Model_Export
      */
     protected function getProcessors()
     {
-        return [
+        $processors = new Varien_Object([
             'customer_address' => 'flurrybox_enhancedprivacy/privacy_export_customerAddress',
             'customer_data' => 'flurrybox_enhancedprivacy/privacy_export_customerData',
             'customer_quote' => 'flurrybox_enhancedprivacy/privacy_export_customerQuote',
             'customer_review' => 'flurrybox_enhancedprivacy/privacy_export_customerReviews',
             'customer_wishlist' => 'flurrybox_enhancedprivacy/privacy_export_customerWishlist'
-        ];
+        ]);
+
+        Mage::dispatchEvent('flurrybox_enhancedprivacy_export_processors', ['processors' => $processors]);
+
+        return $processors->toArray();
     }
 
     /**
      * Create Zip File.
      *
      * @param array $files
-     * @param $zipFileName
+     * @param       $zipFileName
      *
      * @return void
      */
@@ -148,14 +154,14 @@ class Flurrybox_EnhancedPrivacy_Model_Export
 
     /**
      * Delete temporary export files.
-     * 
+     *
      * @param $files
      *
      * @return void
      */
     protected function deleteExportFiles($files)
     {
-        foreach($files as $file) {
+        foreach ($files as $file) {
             $this->deleteFile($this->helper->getZipPath() . $file);
         }
     }

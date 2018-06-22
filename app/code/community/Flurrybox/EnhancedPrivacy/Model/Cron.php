@@ -49,13 +49,13 @@ class Flurrybox_EnhancedPrivacy_Model_Cron
 
         $cleanupSchedule = Mage::getModel('flurrybox_enhancedprivacy/cleanup')
             ->getCollection()
-            ->addFieldToFilter('scheduled_at', array('lteq' => Mage::getModel('core/date')->gmtDate('Y-m-d H:i:s')));
+            ->addFieldToFilter('scheduled_at', array('lteq' => Mage::getModel('core/date')->gmtDate('Y-m-d H:i:s', time())));
 
         foreach ($cleanupSchedule as $item) {
             try {
                 $customer = Mage::getModel('customer/customer')->load($item->getData('customer_id'));
 
-                $this->process($customer,$item->getType());
+                $this->process($customer, $item->getType());
                 $this->saveReason($item->getData('reason'));
 
                 $item->delete();
@@ -74,14 +74,18 @@ class Flurrybox_EnhancedPrivacy_Model_Cron
      */
     protected function getProcessors()
     {
-        return [
-            'flurrybox_enhancedprivacy/privacy_delete_customerAddress',
-            'flurrybox_enhancedprivacy/privacy_delete_customerCompare',
-            'flurrybox_enhancedprivacy/privacy_delete_customerData',
-            'flurrybox_enhancedprivacy/privacy_delete_customerQuote',
-            'flurrybox_enhancedprivacy/privacy_delete_customerReviews',
-            'flurrybox_enhancedprivacy/privacy_delete_customerWishlist'
-        ];
+        $processors = new Varien_Object([
+            'customer_address' => 'flurrybox_enhancedprivacy/privacy_delete_customerAddress',
+            'customer_compare' => 'flurrybox_enhancedprivacy/privacy_delete_customerCompare',
+            'customer_data' => 'flurrybox_enhancedprivacy/privacy_delete_customerData',
+            'customer_quote' => 'flurrybox_enhancedprivacy/privacy_delete_customerQuote',
+            'customer_review' => 'flurrybox_enhancedprivacy/privacy_delete_customerReviews',
+            'customer_wishlist' => 'flurrybox_enhancedprivacy/privacy_delete_customerWishlist'
+        ]);
+
+        Mage::dispatchEvent('flurrybox_enhancedprivacy_delete_processors', ['processors' => $processors]);
+
+        return $processors->toArray();
     }
 
     /**
@@ -121,7 +125,7 @@ class Flurrybox_EnhancedPrivacy_Model_Cron
     protected function saveReason($reason)
     {
         $model = Mage::getModel('flurrybox_enhancedprivacy/reason');
-        $model->setData('reason',$reason);
+        $model->setData('reason', $reason);
         $model->save();
     }
 
